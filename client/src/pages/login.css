@@ -1,0 +1,30 @@
+.login-container {
+  width: 300px;
+  margin: auto;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Tambahkan box-shadow di sini */
+}
+
+.login-form {
+  margin-bottom: 0; /* Menghilangkan margin bawah untuk mencegah ruang tambahan */
+}
+
+.submit-btn {
+  width: 100%;
+}
+
+.register-link {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.register-link a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+}
