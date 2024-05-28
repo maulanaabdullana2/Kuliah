@@ -69,7 +69,7 @@ const getStatusMasuk = async () => {
     });
 
     const filteredStatus = response.data.data.PO.filter(
-      (item) => item.BarangId !== null,
+      (item) => item.BarangId !== null && item.PTid !== null,
     );
 
     setStatus(filteredStatus);
@@ -92,7 +92,7 @@ const getStatusMasuk = async () => {
      );
 
      const filteredStatus = response.data.data.PO.filter(
-       (item) => item.BarangId !== null,
+       (item) => item.BarangId !== null && item.PTid !== null,
      );
 
      setKeluar(filteredStatus);

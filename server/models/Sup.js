@@ -12,9 +12,6 @@ const Supplierchema = new Schema(
     wilayah:{
       type:String
     },
-    lokasi:{
-      type:String
-    },
     userid: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Auth",

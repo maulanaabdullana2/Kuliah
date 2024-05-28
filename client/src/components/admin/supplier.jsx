@@ -21,7 +21,6 @@ function Supplier() {
   const [namaPerusahaan, setNamaPerusahaan] = useState("");
   const [alamat, setAlamat] = useState("");
   const [wilayah, setWilayah] = useState("");
-  const [lokasi, setLokasi] = useState("");
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -69,7 +68,6 @@ function Supplier() {
           namaperusahaan: namaPerusahaan,
           alamat: alamat,
           wilayah: wilayah,
-          lokasi: lokasi,
         },
         {
           headers: {
@@ -86,7 +84,6 @@ function Supplier() {
       setNamaPerusahaan("");
       setWilayah("");
       setAlamat("");
-      setLokasi("");
       fetchData(); // Fetch data again after adding new data
     } catch (error) {
       Swal.fire({
@@ -106,7 +103,6 @@ function Supplier() {
           namaperusahaan: namaPerusahaan,
           alamat: alamat,
           wilayah: wilayah,
-          lokasi: lokasi,
         },
         {
           headers: {
@@ -123,7 +119,6 @@ function Supplier() {
       setNamaPerusahaan("");
       setWilayah("");
       setAlamat("");
-      setLokasi("");
       fetchData(); // Fetch data again after updating
     } catch (error) {
       Swal.fire({
@@ -139,7 +134,6 @@ function Supplier() {
     setNamaPerusahaan(rowData.namaperusahaan);
     setAlamat(rowData.alamat);
     setWilayah(rowData.wilayah);
-    setLokasi(rowData.lokasi);
   };
 
   const handleDelete = async (id) => {
@@ -172,10 +166,9 @@ function Supplier() {
 
   const columns = [
     { field: "no", headerName: "No", },
-    { field: "namaperusahaan", headerName: "Nama Perusahaan", width: 200 },
-    { field: "alamat", headerName: "Alamat", width: 200 },
-    { field: "lokasi", headerName: "Lokasi", width: 250 },
-    { field: "wilayah", headerName: "Wilayah", width: 200 },
+    { field: "namaperusahaan", headerName: "Nama Perusahaan", width: 300 },
+    { field: "alamat", headerName: "Alamat Lengkap", width: 300 },
+    { field: "wilayah", headerName: "Wilayah", width: 210 },
     {
       field: "Aksi",
       headerName: "Aksi",
@@ -223,7 +216,7 @@ function Supplier() {
             }}
           >
             <FontAwesomeIcon icon={faTruck} style={{ marginRight: "5px" }} />
-            Data Supplier
+            Data Perusahaan
           </h1>
         </div>
         <Button
@@ -233,7 +226,7 @@ function Supplier() {
           onClick={handleShowModal}
         >
           <BsPlus style={{ marginRight: "5px", fontSize: iconSize }} />
-          Tambah Data Supplier
+          Tambah Data Perusahaan
         </Button>
       </div>
       <hr style={{ color: "black" }} />
@@ -249,7 +242,7 @@ function Supplier() {
       <Modal show={showModal || showEditModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
           <Modal.Title>
-            {showModal ? "Tambahkan Data Supplier" : "Edit Data Supplier"}
+            {showModal ? "Tambahkan Data Perusahaan" : "Edit Data Perusahaan"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -264,7 +257,7 @@ function Supplier() {
               />
             </Form.Group>
             <Form.Group controlId="alamat">
-              <Form.Label>Alamat</Form.Label>
+              <Form.Label>Alamat Lengkap</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Masukkan alamat"
@@ -279,15 +272,6 @@ function Supplier() {
                 placeholder="Masukkan wilayah"
                 value={wilayah}
                 onChange={(e) => setWilayah(e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group controlId="lokasi">
-              <Form.Label>Lokasi</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Masukkan lokasi"
-                value={lokasi}
-                onChange={(e) => setLokasi(e.target.value)}
               />
             </Form.Group>
           </Form>

@@ -71,47 +71,48 @@ const UserComponent = () => {
       setBarang(response.data.data.suppliers);
     } catch (error) {
       console.error("Error fetching supplier data:", error);
-      setError("Gagal mengambil data supplier.");
+      setError("Gagal mengambil data perusahaan.");
     }
   };
 
-  const fetchInvoices = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(
-        "http://localhost:5000/api/v1/po/keluar",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+ const fetchInvoices = async () => {
+   try {
+     const token = localStorage.getItem("token");
+     const response = await axios.get(
+       "http://localhost:5000/api/v1/po/keluar",
+       {
+         headers: {
+           Authorization: `Bearer ${token}`,
+         },
+       },
+     );
 
-      const filteredData = response.data.data.PO.filter(
-        (item) => item.BarangId !== null,
-      );
+     const filteredData = response.data.data.PO.filter(
+       (item) => item.BarangId !== null && item.PTid !== null, // Add a null check for PTid
+     );
 
-      const modifiedData = filteredData.map((item, index) => ({
-        ...item,
-        id: index + 1,
-        Tgl_PO: formatDate(item.Tgl_PO),
-        PTid: item.PTid._id,
-        PTname: item.PTid.namaperusahaan,
-        BarangId: item.BarangId._id,
-        BarangName: item.BarangId.jenisbarang,
-        fileUrl: item.fileUrl,
-      }));
+     const modifiedData = filteredData.map((item, index) => ({
+       ...item,
+       id: index + 1,
+       Tgl_PO: formatDate(item.Tgl_PO),
+       PTid: item.PTid ? item.PTid._id : null, // Add a null check for PTid and handle accordingly
+       PTname: item.PTid ? item.PTid.namaperusahaan : "",
+       BarangId: item.BarangId ? item.BarangId._id : null,
+       BarangName: item.BarangId ? item.BarangId.jenisbarang : "",
+       fileUrl: item.fileUrl,
+     }));
 
-      const dataWithoutTimestamps = modifiedData.map(
-        ({ createdAt, updatedAt, ...rest }) => rest,
-      );
+     const dataWithoutTimestamps = modifiedData.map(
+       ({ createdAt, updatedAt, ...rest }) => rest,
+     );
 
-      setPo(dataWithoutTimestamps);
-    } catch (error) {
-      console.error("Error fetching invoices:", error);
-      setError("Gagal mengambil data faktur.");
-    }
-  };
+     setPo(dataWithoutTimestamps);
+   } catch (error) {
+     console.error("Error fetching invoices:", error);
+     setError("Gagal mengambil data faktur.");
+   }
+ };
+
 
 
   const formatDate = (dateString) => {

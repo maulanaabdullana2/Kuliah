@@ -34,7 +34,8 @@ function Home() {
       );
 
       const filteredData = response.data.data.PO.filter(
-        (item) => item.userid !== null && item.BarangId !== null,
+        (item) =>
+          item.userid !== null && item.BarangId !== null && item.PTid !== null,
       );
 
       setMasuk(filteredData);
@@ -57,7 +58,7 @@ function Home() {
       );
 
       const filteredData = response.data.data.PO.filter(
-        (item) => item.userid !== null && item.BarangId !== null,
+        (item) => item.userid !== null && item.BarangId !== null && item.PTid !== null,
       );
 
       setKeluar(filteredData);

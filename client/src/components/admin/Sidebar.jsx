@@ -110,7 +110,7 @@ function Sidebar({ openSidebarToggle, OpenSidebar, handleMenuClick }) {
         >
           <a href="#">
             <FontAwesomeIcon icon={faTruck} className="icon" />
-            Data Supplier
+            Data Perusahaan
           </a>
         </li>
         <li

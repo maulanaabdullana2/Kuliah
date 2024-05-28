@@ -45,9 +45,9 @@ const UserComponent = () => {
           id: item._id,
           No_PO: item.No_po,
           Tgl_PO: formatDate(item.Tgl_PO),
+          lokasi: item.userid ? item.userid.lokasi : "",
           Nama_Perusahaan: item.PTid ? item.PTid.namaperusahaan : "",
-          jumlah: item.jumlah,
-          lokasi: item.PTid ? item.PTid.lokasi : "", // Corrected to use PTid for location
+          jumlah: item.jumlah, // Corrected to use PTid for location
           Bahan_Baku: item.BarangId ? item.BarangId.jenisbarang : "",
           fileUrl: item.fileUrl, // Added fileUrl
           price: item.price,
@@ -55,7 +55,7 @@ const UserComponent = () => {
         }));
 
         const filteredPoData = poData.filter(
-          (item) => item.Bahan_Baku && item.No_PO,
+          (item) => item.Bahan_Baku && item.No_PO && item.Nama_Perusahaan,
         );
 
         setPo(filteredPoData);

@@ -1,14 +1,14 @@
+const kirim = require("../models/InModels")
 const Suppliers = require("../models/Sup")
 const ApiError = require("../utils/ApiError")
 
 const createsupplier = async(req,res,next) =>{
     try {
-        const {namaperusahaan,alamat,wilayah,lokasi} = req.body
+        const {namaperusahaan,alamat,wilayah} = req.body
         const supllier = await Suppliers.create({
             namaperusahaan,
             alamat,
             wilayah,
-            lokasi,
         })
         res.status(201).json({
             status:"success",
@@ -60,10 +60,10 @@ const getAllSuppliers = async (req, res, next) => {
 const updateSupplier = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { namaperusahaan, alamat, wilayah, lokasi } = req.body;
+    const { namaperusahaan, alamat, wilayah } = req.body;
     const updatedSupplier = await Suppliers.findOneAndUpdate(
       { _id: id }, // Ensure updating only the user's supplier
-      { namaperusahaan, alamat, wilayah, lokasi },
+      { namaperusahaan, alamat, wilayah},
       { new: true },
     );
     if (!updatedSupplier) {
@@ -90,6 +90,7 @@ const deleteSupplier = async (req, res, next) => {
     const deletedSupplier = await Suppliers.findOneAndDelete({
       _id: id,
     }); 
+
     if (!deletedSupplier) {
       return res.status(404).json({
         status: "fail",
