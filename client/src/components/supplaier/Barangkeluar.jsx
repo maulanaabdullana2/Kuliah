@@ -220,18 +220,13 @@ const handleSubmit = async () => {
       }
     });
 
-    // Check if the PO already exists
-    const existingPO = Po.find((item) => item.No_po === formData.No_po);
-    if (existingPO) {
-      throw new Error("Silakan gunakan nomor PO yang berbeda.");
-    }
+  
 
     const barang = Barang.find((item) => item._id === formData.BarangId);
     if (!barang) {
       throw new Error("Barang tidak ditemukan.");
     }
 
-    // Check if the stock is sufficient
     if (parseFloat(formData.jumlah) > barang.stock) {
       throw new Error("Stock tidak mencukupi.");
     }
@@ -372,7 +367,7 @@ const handleSubmit = async () => {
             }}
           >
             <FaBox style={{ marginRight: "5px", fontSize: iconSize }} />
-            Barang Keluar
+            Pengeluaran Barang
           </h1>
         </div>
         <Button

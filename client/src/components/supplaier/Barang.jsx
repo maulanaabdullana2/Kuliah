@@ -219,11 +219,6 @@ const UserComponent = () => {
         }
       });
 
-      const existingPO = Po.find((item) => item.No_po === formData.No_po);
-      if (existingPO) {
-        throw new Error("Silakan gunakan nomor PO yang berbeda.");
-      }
-
       const barang = Barang.find((item) => item._id === formData.BarangId);
       if (!barang) {
         throw new Error("Barang tidak ditemukan.");
@@ -357,7 +352,7 @@ const UserComponent = () => {
             }}
           >
             <FaBox style={{ marginRight: "5px", fontSize: iconSize }} />
-            Barang Masuk
+            Penerimaan Barang
           </h1>
         </div>
         <Button

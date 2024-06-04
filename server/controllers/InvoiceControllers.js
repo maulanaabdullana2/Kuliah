@@ -7,7 +7,7 @@ const Suppliers = require("../models/Sup");
 const generateInvoice = async (req, res, next) => {
     try {
       const { orderId } = req.body;
-    console.log(orderId);
+      console.log(orderId);
   
 
      const products = [];
@@ -42,7 +42,7 @@ const generateInvoice = async (req, res, next) => {
 
      const data = {
        apiKey:
-         "yeaD0R89SCU9tVncL4e2vY0rs2DLfcXJzpTmoYFsQ7ojV0qonMLPxj5PLTp8ZL7C",
+         "8X5mXyiYnBRY8QRd6y6xpkBTjJkPwfWnk6cI1A4VNv6FBtUDTN89M3k7VTM8yPE1",
        images: {
          logo: "https://ik.imagekit.io/aiilsappn/WhatsApp%20Image%202024-03-26%20at%2013.13.37_bb9b3324.jpg?updatedAt=1711433794721",
        },
@@ -64,7 +64,7 @@ const generateInvoice = async (req, res, next) => {
        client: {
          company: NamaPerusahaan.namaperusahaan || "",
          zip: NamaPerusahaan.alamat || "",
-         country:  NamaPerusahaan.wilayah,
+         country: NamaPerusahaan.wilayah,
        },
        invoiceDate: new Date().toDateString(),
        products: products.filter((product) => product.quantity > 0),

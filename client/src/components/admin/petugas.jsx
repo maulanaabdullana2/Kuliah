@@ -258,7 +258,7 @@ function Petugas() {
             }}
           >
             <FaUserFriends style={{ marginRight: "5px", fontSize: iconSize }} />
-            Petugas
+           Data Petugas
           </h1>
         </div>
         <Button

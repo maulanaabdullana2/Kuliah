@@ -8,16 +8,6 @@ const Barangmasuk = async (req, res, next) => {
     const file = req.file;
     let fileUrl;
 
-     const existingPO = await POorder.findOne({ No_po: No_po.toUpperCase() });
-
-     if (existingPO) {
-       return res.status(400).json({
-         status: "error",
-         message: "Nomor PO sudah ada. Silakan gunakan nomor PO yang berbeda.",
-       });
-     }
-
-
     if (!No_po || !jumlah || !PTid || !BarangId) {
       return res.status(400).json({
         status: "error",
@@ -73,15 +63,6 @@ const Barangkeluar = async (req, res, next) => {
     const { No_po, jumlah, PTid, BarangId, price } = req.body;
     const file = req.file;
     let fileUrl;
-
-    const existingPO = await POorder.findOne({ No_po: No_po.toUpperCase() });
-
-    if (existingPO) {
-      return res.status(400).json({
-        status: "error",
-        message: "Nomor PO sudah ada. Silakan gunakan nomor PO yang berbeda.",
-      });
-    }
 
     if (!No_po || !jumlah || !PTid || !BarangId) {
       return res.status(400).json({

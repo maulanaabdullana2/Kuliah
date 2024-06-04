@@ -166,8 +166,8 @@ function Supplier() {
 
   const columns = [
     { field: "no", headerName: "No", },
-    { field: "namaperusahaan", headerName: "Nama Perusahaan", width: 300 },
-    { field: "alamat", headerName: "Alamat Lengkap", width: 300 },
+    { field: "namaperusahaan", headerName: "Nama Perusahaan", width: 230 },
+    { field: "alamat", headerName: "Alamat Lengkap", width: 400 },
     { field: "wilayah", headerName: "Wilayah", width: 210 },
     {
       field: "Aksi",

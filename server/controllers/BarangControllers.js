@@ -5,12 +5,11 @@ const ApiError = require("../utils/ApiError");
 
 const CreateBarang = async (req, res, next) => {
   try {
-    const { jenisbarang, price } = req.body;
+    const { jenisbarang} = req.body;
     const userid = req.user.id;
 
     const supplier = await Supplier.create({
       jenisbarang,
-      price,
       userid: userid,
     });
 
@@ -35,33 +34,6 @@ const GetBarang = async (req, res, next) => {
       message: "Data Retrieved Successfully",
       data: {
         suppliers,
-      },
-    });
-  } catch (error) {
-    next(new ApiError(error.message));
-  }
-};
-
-const UpdateDataBarang = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const { jenisbarang, price, jumlah } = req.body;
-
-    const updatedSupplier = await Supplier.findByIdAndUpdate(
-      id,
-      { jenisbarang,price, },
-      { new: true },
-    );
-
-    if (!updatedSupplier) {
-      return next(new ApiError("Supplier not found", 404));
-    }
-
-    res.status(200).json({
-      status: "Success",
-      message: "Supplier updated successfully",
-      data: {
-        supplier: updatedSupplier,
       },
     });
   } catch (error) {
@@ -166,7 +138,6 @@ const GetallBarang = async (req, res, next) => {
 module.exports = {
   CreateBarang,
   GetBarang,
-  UpdateDataBarang,
   GetBarangbyid,
   deleteBarang,
   UpdateStockBarang,

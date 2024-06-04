@@ -113,7 +113,7 @@ function Home() {
       valueFormatter: (params) => `${params.value} kg`,
     },
     { field: "userName", headerName: "Nama Petugas", width: 250 },
-    { field: "lokasi", headerName: "Lokasi", width: 250 },
+    { field: "lokasi", headerName: "Lokasi"},
   ];
 
   return (
@@ -155,7 +155,7 @@ function Home() {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <div style={{ height: 400, width: "100%" }}>
+      <div style={{ height: 300, width: "100%" }}>
         <DataGrid
           rows={filteredData}
           columns={columns}
