@@ -17,15 +17,18 @@ function DashboardComponents(props) {
    const Navigate = useNavigate();
 
   useEffect(() => {
-    if (token) {
+    if (!token) {
+      Navigate("/");
+    } else {
       const decodedToken = jwtDecode(token);
       if (decodedToken && decodedToken.role === "petugas") {
         setUser(true);
-      }else{
+      } else {
         Navigate("/dashboard/admin");
       }
     }
-  }, [token]);
+  }, [token, Navigate]);
+
 
   const OpenSidebar = () => {
     setOpenSidebarToggle(!openSidebarToggle);

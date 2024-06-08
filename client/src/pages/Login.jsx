@@ -55,7 +55,13 @@ function Login() {
         className="login-form p-4 rounded shadow-lg"
         style={{ maxWidth: "800px" }}
       >
-        <h2 className="mb-4 text-center">Login</h2>
+        <div className="text-center mb-4">
+          <img
+            src="../src/assets/logo.jpg"
+            alt="Company Logo"
+            style={{ width: "150px", objectFit:"contain" }}
+          />
+        </div>
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Label>Username</Form.Label>

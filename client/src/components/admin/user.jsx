@@ -47,9 +47,9 @@ const UserComponent = () => {
           Tgl_PO: formatDate(item.Tgl_PO),
           lokasi: item.userid ? item.userid.lokasi : "",
           Nama_Perusahaan: item.PTid ? item.PTid.namaperusahaan : "",
-          jumlah: item.jumlah, // Corrected to use PTid for location
+          jumlah: item.jumlah,
           Bahan_Baku: item.BarangId ? item.BarangId.jenisbarang : "",
-          fileUrl: item.fileUrl, // Added fileUrl
+          fileUrl: item.fileUrl,
           price: item.price,
           status: item.status,
         }));
@@ -133,6 +133,49 @@ const UserComponent = () => {
     (item) => item.lokasi !== null && item.lokasi !== "",
   );
 
+  const numberedFilteredPo = filteredPoWithLocation.map((item, index) => ({
+    ...item,
+    no: index + 1,
+  }));
+
+  const columns = [
+    { field: "no", headerName: "No", width: 85 },
+    { field: "No_PO", headerName: "No. PO", width: 150 },
+    { field: "Nama_Perusahaan", headerName: "Nama Perusahaan", width: 150 },
+    { field: "Bahan_Baku", headerName: "Jenis Barang", width: 110 },
+    {
+      field: "jumlah",
+      headerName: "Jumlah",
+      width: 82,
+      valueFormatter: (params) => `${params.value} kg`,
+    },
+    {
+      field: "price",
+      headerName: "Harga (kg)",
+      width: 90,
+      valueFormatter: (params) => `Rp.${params.value}`,
+    },
+    { field: "Tgl_PO", headerName: "Tanggal", width: 100 },
+    { field: "lokasi", headerName: "Lokasi", width: 100 },
+    { field: "status", headerName: "Status", width: 80 },
+    {
+      field: "fileUrl",
+      headerName: "File",
+      renderCell: (params) => (
+        <div>
+          <Button
+            variant="primary"
+            size="sm"
+            style={{ marginRight: 5 }}
+            onClick={() => handleViewFile(params.row.fileUrl)}
+          >
+            <BsEyeFill />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="main-container">
       <h1
@@ -147,37 +190,37 @@ const UserComponent = () => {
         Data Kiriman
       </h1>
       <hr style={{ color: "black" }} />
-      <div className="d-flex">
-        <div className="flex-grow-1 me-2">
+      <div className="form-container d-flex flex-wrap mb-3">
+        <div className="me-2 mb-2">
           <input
             type="text"
             placeholder="Cari Berdasarkan No Po"
             value={searchQuery}
             onChange={handleSearchChange}
-            className="form-control mb-2"
+            className="form-control"
             style={buttonAndInputStyle}
           />
         </div>
-        <div className="me-2">
+        <div className="me-2 mb-2">
           <select
             value={selectedMonth}
             onChange={handleMonthChange}
-            className="form-select mb-2"
+            className="form-select"
             style={buttonAndInputStyle}
           >
-            <option value="">Select Month</option>
-            <option value="01">January</option>
-            <option value="02">February</option>
-            <option value="03">March</option>
+            <option value="">Pilih Bulan</option>
+            <option value="01">Januari</option>
+            <option value="02">Februari</option>
+            <option value="03">Maret</option>
             <option value="04">April</option>
-            <option value="05">May</option>
-            <option value="06">June</option>
-            <option value="07">July</option>
-            <option value="08">August</option>
+            <option value="05">Mei</option>
+            <option value="06">Juni</option>
+            <option value="07">Juli</option>
+            <option value="08">Agustus</option>
             <option value="09">September</option>
-            <option value="10">October</option>
+            <option value="10">Oktober</option>
             <option value="11">November</option>
-            <option value="12">December</option>
+            <option value="12">Desember</option>
           </select>
         </div>
         <div>
@@ -199,64 +242,16 @@ const UserComponent = () => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClosePdfModal}>
-            Tutup
+            Close
           </Button>
         </Modal.Footer>
       </Modal>
-      <div style={{ height: 400, width: "100%", marginTop: "5px" }}>
+      <div style={{ height: 400, width: "100%" }}>
         <DataGrid
-          rows={filteredPoWithLocation}
-          columns={[
-            {
-              field: "No_PO",
-              headerName: "No. PO",
-              width: 170,
-            },
-            {
-              field: "Nama_Perusahaan",
-              headerName: "Nama Perusahaan",
-              width: 150,
-            },
-            {
-              field: "Bahan_Baku",
-              headerName: "Jenis Barang",
-              width: 110,
-            },
-            {
-              field: "jumlah",
-              headerName: "Jumlah",
-              width: 110,
-              valueFormatter: (params) => `${params.value} kg`,
-            },
-            {
-              field: "price",
-              headerName: "Harga (kg)",
-              width: 110,
-              valueFormatter: (params) => `Rp.${params.value}`,
-            },
-            { field: "Tgl_PO", headerName: "Tanggal", width: 100 },
-            { field: "lokasi", headerName: "Lokasi", width: 100 },
-            { field: "status", headerName: "Status", width: 100 },
-            {
-              field: "fileUrl",
-              headerName: "File",
-              renderCell: (params) => (
-                <div>
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    style={{ marginRight: 5 }}
-                    onClick={() => handleViewFile(params.row.fileUrl)}
-                  >
-                    <BsEyeFill />
-                  </Button>
-                </div>
-              ),
-            },
-          ]}
+          rows={numberedFilteredPo}
+          columns={columns}
           pageSize={5}
           rowsPerPageOptions={[5, 10, 20]}
-          disableSelectionOnClick
         />
       </div>
     </div>

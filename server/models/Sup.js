@@ -9,9 +9,6 @@ const Supplierchema = new Schema(
     alamat:{
       type:String
     },
-    wilayah:{
-      type:String
-    },
     userid: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Auth",

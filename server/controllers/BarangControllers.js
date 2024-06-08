@@ -2,15 +2,29 @@ const Barang = require("../models/BarangModels");
 const Supplier = require("../models/BarangModels");
 const kirim = require("../models/InModels");
 const ApiError = require("../utils/ApiError");
+const imagekit = require("../lib/imagekit");
 
 const CreateBarang = async (req, res, next) => {
   try {
-    const { jenisbarang} = req.body;
+    let { jenisbarang} = req.body;
+    jenisbarang = jenisbarang.charAt(0).toUpperCase() + jenisbarang.slice(1);
     const userid = req.user.id;
+    const file = req.file;
+
+      let image;
+
+      if (file) {
+        const img = await imagekit.upload({
+          file: file.buffer,
+          fileName: file.originalname,
+        });
+        image = img.url;
+      }
 
     const supplier = await Supplier.create({
       jenisbarang,
       userid: userid,
+      image
     });
 
     res.status(201).json({
@@ -94,11 +108,25 @@ const deleteBarang = async (req, res, next) => {
 const UpdateStockBarang = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { stock, jenisbarang, price } = req.body;
+    const { stock, jenisbarang } = req.body;
+     const userId = req.user.id;
+
+    const existingBarang = await Supplier.findOne({ _id: id, userid : userId });
+
+      let image = existingBarang.image;
+      const file = req.file;
+
+      if (file) {
+        const img = await imagekit.upload({
+          file: file.buffer,
+          fileName: file.originalname,
+        });
+        image = img.url;
+      }
 
     const updatedSupplier = await Supplier.findByIdAndUpdate(
       id,
-      { stock, jenisbarang, price },
+      { stock, jenisbarang, image },
       { new: true },
     );
 

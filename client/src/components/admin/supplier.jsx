@@ -15,22 +15,29 @@ const headerFontSize = "24px";
 
 function Supplier() {
   const [showModal, setShowModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false); // State for edit modal
-  const [editData, setEditData] = useState(null); // State to hold data for editing
-  const [deleteId, setDeleteId] = useState(null); // State to hold id for deletion
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editData, setEditData] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
   const [namaPerusahaan, setNamaPerusahaan] = useState("");
   const [alamat, setAlamat] = useState("");
-  const [wilayah, setWilayah] = useState("");
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isFormValid, setIsFormValid] = useState(false);
 
   useEffect(() => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    setIsFormValid(
+      namaPerusahaan.trim() !== "" &&
+        alamat.trim() !== ""
+    );
+  }, [namaPerusahaan, alamat]);
+
   const handleCloseModal = () => {
     setShowModal(false);
-    setShowEditModal(false); // Close edit modal when main modal closes
+    setShowEditModal(false);
   };
 
   const handleShowModal = () => setShowModal(true);
@@ -51,7 +58,7 @@ function Supplier() {
       const mappedData = response.data.data.suppliers.map((row, index) => ({
         ...row,
         id: row._id,
-        no:index+1 // Assuming _id is unique for each row
+        no: index + 1,
       }));
       setData(mappedData);
     } catch (error) {
@@ -62,12 +69,11 @@ function Supplier() {
   const handleSubmit = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:5000/api/v1/pt/add",
         {
           namaperusahaan: namaPerusahaan,
           alamat: alamat,
-          wilayah: wilayah,
         },
         {
           headers: {
@@ -82,9 +88,8 @@ function Supplier() {
       });
       handleCloseModal();
       setNamaPerusahaan("");
-      setWilayah("");
       setAlamat("");
-      fetchData(); // Fetch data again after adding new data
+      fetchData();
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -97,12 +102,11 @@ function Supplier() {
   const handleEditSubmit = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.put(
-        `http://localhost:5000/api/v1/pt/${editData.id}`, // Assuming you have an endpoint for updating data by id
+      await axios.put(
+        `http://localhost:5000/api/v1/pt/${editData.id}`,
         {
           namaperusahaan: namaPerusahaan,
           alamat: alamat,
-          wilayah: wilayah,
         },
         {
           headers: {
@@ -117,9 +121,8 @@ function Supplier() {
       });
       handleCloseModal();
       setNamaPerusahaan("");
-      setWilayah("");
       setAlamat("");
-      fetchData(); // Fetch data again after updating
+      fetchData();
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -133,7 +136,6 @@ function Supplier() {
     handleShowEditModal(rowData);
     setNamaPerusahaan(rowData.namaperusahaan);
     setAlamat(rowData.alamat);
-    setWilayah(rowData.wilayah);
   };
 
   const handleDelete = async (id) => {
@@ -165,10 +167,9 @@ function Supplier() {
   };
 
   const columns = [
-    { field: "no", headerName: "No", },
+    { field: "no", headerName: "No", width: 70 },
     { field: "namaperusahaan", headerName: "Nama Perusahaan", width: 230 },
-    { field: "alamat", headerName: "Alamat Lengkap", width: 400 },
-    { field: "wilayah", headerName: "Wilayah", width: 210 },
+    { field: "alamat", headerName: "Alamat Perusahaan", width: 650 },
     {
       field: "Aksi",
       headerName: "Aksi",
@@ -184,7 +185,7 @@ function Supplier() {
           <Button
             variant="danger"
             size="sm"
-            onClick={() => handleDelete(params.row._id)}
+            onClick={() => handleDelete(params.row.id)}
             style={{ marginLeft: "5px" }}
           >
             <BsTrash />
@@ -194,9 +195,14 @@ function Supplier() {
     },
   ];
 
-  const filteredData = data.filter((row) =>
-    row.namaperusahaan.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const filteredData = data
+    .filter((row) =>
+      row.namaperusahaan.toLowerCase().includes(searchTerm.toLowerCase()),
+    )
+    .map((row, index) => ({
+      ...row,
+      no: index + 1,
+    }));
 
   return (
     <div className="main-container">
@@ -230,12 +236,13 @@ function Supplier() {
         </Button>
       </div>
       <hr style={{ color: "black" }} />
-      <div className="mb-3">
+      <div className="me-2 mb-3">
         <input
           type="text"
           placeholder="Cari Berdasarkan Nama Perusahaan"
           className="form-control"
           value={searchTerm}
+          style={{width:"30%"}}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
@@ -246,7 +253,7 @@ function Supplier() {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form onSubmit={showModal ? handleSubmit : handleEditSubmit}>
+          <Form>
             <Form.Group controlId="namaPerusahaan">
               <Form.Label>Nama Perusahaan</Form.Label>
               <Form.Control
@@ -257,21 +264,12 @@ function Supplier() {
               />
             </Form.Group>
             <Form.Group controlId="alamat">
-              <Form.Label>Alamat Lengkap</Form.Label>
+              <Form.Label>Alamat</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Masukkan alamat"
                 value={alamat}
                 onChange={(e) => setAlamat(e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group controlId="wilayah">
-              <Form.Label>Wilayah</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Masukkan wilayah"
-                value={wilayah}
-                onChange={(e) => setWilayah(e.target.value)}
               />
             </Form.Group>
           </Form>
@@ -283,6 +281,7 @@ function Supplier() {
           <Button
             variant="primary"
             onClick={showModal ? handleSubmit : handleEditSubmit}
+            disabled={!isFormValid}
           >
             {showModal ? "Submit" : "Simpan Perubahan"}
           </Button>

@@ -4,11 +4,10 @@ const ApiError = require("../utils/ApiError")
 
 const createsupplier = async(req,res,next) =>{
     try {
-        const {namaperusahaan,alamat,wilayah} = req.body
+        const {namaperusahaan,alamat} = req.body
         const supllier = await Suppliers.create({
             namaperusahaan,
             alamat,
-            wilayah,
         })
         res.status(201).json({
             status:"success",
@@ -60,10 +59,10 @@ const getAllSuppliers = async (req, res, next) => {
 const updateSupplier = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { namaperusahaan, alamat, wilayah } = req.body;
+    const { namaperusahaan, alamat } = req.body;
     const updatedSupplier = await Suppliers.findOneAndUpdate(
-      { _id: id }, // Ensure updating only the user's supplier
-      { namaperusahaan, alamat, wilayah},
+      { _id: id },
+      { namaperusahaan, alamat},
       { new: true },
     );
     if (!updatedSupplier) {

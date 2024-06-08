@@ -220,13 +220,18 @@ const handleSubmit = async () => {
       }
     });
 
-  
+    // Check if the PO already exists
+    const existingPO = Po.find((item) => item.No_po === formData.No_po);
+    if (existingPO) {
+      throw new Error("Silakan gunakan nomor PO yang berbeda.");
+    }
 
     const barang = Barang.find((item) => item._id === formData.BarangId);
     if (!barang) {
       throw new Error("Barang tidak ditemukan.");
     }
 
+    // Check if the stock is sufficient
     if (parseFloat(formData.jumlah) > barang.stock) {
       throw new Error("Stock tidak mencukupi.");
     }
@@ -281,6 +286,13 @@ const handleSubmit = async () => {
     setLoading(false);
   }
 };
+
+const isFormValid =
+  formData.No_po &&
+  formData.jumlah &&
+  formData.PTid &&
+  formData.BarangId &&
+  formData.price;
 
   const columns = [
     { field: "id", headerName: "No" },
@@ -347,7 +359,11 @@ const handleSubmit = async () => {
       (item.Bahan_Baku &&
         item.Bahan_Baku.toLowerCase().includes(searchQuery.toLowerCase())) ||
       searchQuery.trim() === "",
-  );
+  ).map((item, index) => ({
+    ...item,
+    id: index + 1,
+  }));
+
 
   return (
     <div className="main-container">
@@ -386,6 +402,7 @@ const handleSubmit = async () => {
           type="text"
           placeholder="Cari berdasarkan No Po"
           value={searchQuery}
+          style={{ width: "30%" }}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="form-control"
         />
@@ -493,7 +510,11 @@ const handleSubmit = async () => {
           <Button variant="secondary" onClick={handleClose}>
             Tutup
           </Button>
-          <Button variant="primary" onClick={handleSubmit} disabled={loading}>
+          <Button
+            variant="primary"
+            onClick={handleSubmit}
+            disabled={loading || !isFormValid}
+          >
             {loading ? "Mengirimkan..." : "Tambahkan"}
           </Button>
         </Modal.Footer>

@@ -7,7 +7,7 @@ import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { FaArrowDown, FaArrowUp, FaBox, FaBoxOpen } from "react-icons/fa";
+import { FaArrowDown, FaArrowUp } from "react-icons/fa";
 
 import "../supplaier/supplier.css";
 
@@ -23,84 +23,88 @@ function Datas() {
   const [suppliers, setSuppliers] = useState([]);
   const [editItemId, setEditItemId] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [file, setFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedItemImage, setSelectedItemImage] = useState(null);
+  const [selectedItemType, setSelectedItemType] = useState("");
+  const [selectstock, setselectStock] = useState("");
 
   const handleClose = () => {
     setShowModal(false);
     setEditItemId("");
     setJenisBarang("");
     setStock(0);
+    setFile(null);
   };
 
   const handleShow = () => setShowModal(true);
 
+  const handleImageModal = (item) => {
+    setSelectedItem(item);
+    setSelectedItemImage(item.image);
+    setSelectedItemType(item.jenisbarang);
+    setselectStock(item.stock);
+    setShowDetailModal(true);
+  };
+
   const handleSubmit = async () => {
+    setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.post(
-        "http://localhost:5000/api/v1/supplier/add",
-        {
-          jenisbarang: jenisbarang,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
+      const formData = new FormData();
+      formData.append("jenisbarang", jenisbarang);
+      formData.append("stock", stock);
+      if (file) {
+        formData.append("image", file);
+      }
+
+      if (editItemId) {
+        // Jika sedang mengedit data
+        await axios.put(
+          `http://localhost:5000/api/v1/supplier/stock/${editItemId}`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
           },
-        },
-      );
+        );
+      } else {
+        // Jika sedang menambah data baru
+        await axios.post(
+          "http://localhost:5000/api/v1/supplier/add",
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          },
+        );
+      }
+
       handleClose();
       fetchData();
       Swal.fire({
         icon: "success",
         title: "Sukses!",
-        text: "Data berhasil ditambahkan.",
+        text: editItemId
+          ? "Data berhasil diubah."
+          : "Data berhasil ditambahkan.",
       });
     } catch (error) {
-      console.error("Error adding supplier:", error);
+      console.error("Error adding or editing supplier:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-const getStatusMasuk = async () => {
-  try {
-    const token = localStorage.getItem("token");
-    const response = await axios.get("http://localhost:5000/api/v1/po/masuk", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const filteredStatus = response.data.data.PO.filter(
-      (item) => item.BarangId !== null && item.PTid !== null,
-    );
-
-    setStatus(filteredStatus);
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-};
-
-
- const getStatusKeluar = async () => {
-   try {
-     const token = localStorage.getItem("token");
-     const response = await axios.get(
-       "http://localhost:5000/api/v1/po/keluar",
-       {
-         headers: {
-           Authorization: `Bearer ${token}`,
-         },
-       },
-     );
-
-     const filteredStatus = response.data.data.PO.filter(
-       (item) => item.BarangId !== null && item.PTid !== null,
-     );
-
-     setKeluar(filteredStatus);
-   } catch (error) {
-     console.error("Error fetching data:", error);
-   }
- };
-
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
 
   const fetchData = async () => {
     try {
@@ -120,6 +124,50 @@ const getStatusMasuk = async () => {
       );
 
       setSuppliers(filteredSuppliers);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const getStatusMasuk = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        "http://localhost:5000/api/v1/po/masuk",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const filteredStatus = response.data.data.PO.filter(
+        (item) => item.BarangId !== null && item.PTid !== null,
+      );
+
+      setStatus(filteredStatus);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const getStatusKeluar = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        "http://localhost:5000/api/v1/po/keluar",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const filteredStatus = response.data.data.PO.filter(
+        (item) => item.BarangId !== null && item.PTid !== null,
+      );
+
+      setKeluar(filteredStatus);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -152,6 +200,7 @@ const getStatusMasuk = async () => {
           },
         });
         fetchData();
+        setShowDetailModal(false);
         Swal.fire("Terhapus!", "Data Anda telah dihapus.", "success");
       }
     } catch (error) {
@@ -159,50 +208,24 @@ const getStatusMasuk = async () => {
     }
   };
 
-  const handleEdit = (id, stock, jenisbarang) => {
-    setEditItemId(id);
-    setStock(stock);
-    setJenisBarang(jenisbarang);
+  const handleEdit = (item) => {
+    setEditItemId(item._id);
+    setJenisBarang(item.jenisbarang);
+    setStock(item.stock);
     setShowModal(true);
-  };
-
-  const handleEditSubmit = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.put(
-        `http://localhost:5000/api/v1/supplier/stock/${editItemId}`,
-        {
-          stock: stock,
-          jenisbarang: jenisbarang,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      handleClose();
-      fetchData();
-      Swal.fire({
-        icon: "success",
-        title: "Sukses!",
-        text: "Data berhasil diubah.",
-      });
-    } catch (error) {
-      console.error("Error editing stock:", error);
-    }
+    setShowDetailModal(false); // Tutup modal detail saat membuka modal edit
   };
 
   const columns = [
     {
       field: "id",
       headerName: "No",
-      width: 200,
+      width: 150,
       valueGetter: (params) => {
         const index = suppliers.findIndex(
           (supplier) => supplier._id === params.row._id,
         );
-        return params.row.userid ? index + 1 : null; // Check if userid is not null before assigning the index
+        return params.row.userid ? index + 1 : null;
       },
     },
     { field: "jenisbarang", headerName: "Jenis Barang", width: 350 },
@@ -214,29 +237,17 @@ const getStatusMasuk = async () => {
     },
     {
       field: "actions",
-      headerName: "Aksi",
+      headerName: "Actions",
+      minWidth: 150,
       renderCell: (params) => (
         <div>
           <Button
-            variant="primary"
+            variant="info"
             size="sm"
-            onClick={() =>
-              handleEdit(
-                params.row._id,
-                params.row.stock,
-                params.row.jenisbarang,
-              )
-            }
-          >
-            <BsPencil />
-          </Button>
-          <Button
-            variant="danger"
-            size="sm"
-            onClick={() => handleDelete(params.row._id)}
+            onClick={() => handleImageModal(params.row)}
             style={{ marginLeft: "5px" }}
           >
-            <BsTrash />
+            Detail
           </Button>
         </div>
       ),
@@ -313,17 +324,73 @@ const getStatusMasuk = async () => {
           style={{ height: "38px", width: "25%" }}
         />
       </div>
-        <DataGrid
-          rows={suppliers}
-          columns={columns}
-          pageSize={5}
-          rowsPerPageOptions={[5, 10, 20]}
-          disableSelectionOnClick
-          getRowId={(row) => row._id}
-          style={{ height: 300 }}
-          className="mt-3"
-        />
-      <Modal show={showModal} onHide={handleClose}>
+      <DataGrid
+        rows={suppliers}
+        columns={columns}
+        pageSize={5}
+        rowsPerPageOptions={[5, 10, 20]}
+        disableSelectionOnClick
+        getRowId={(row) => row._id}
+        style={{ height: 400 }}
+        className="mt-3"
+      />
+      <Modal show={showDetailModal} onHide={() => setShowDetailModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title style={{ fontWeight: "normal" }}>
+            Detail Barang
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedItem && (
+            <div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginLeft: "5%",
+                }}
+              >
+                <img
+                  src={selectedItemImage}
+                  alt="Gambar Barang"
+                  style={{
+                    maxWidth: "150px",
+                    maxHeight: "150px",
+                    borderRadius: "5px",
+                    marginRight: "15%",
+                  }}
+                />
+                <div>
+                  <p style={{ fontSize: "18px", marginBottom: "10px" }}>
+                    <span>Jenis Barang:</span> {selectedItemType}
+                  </p>
+                  <p
+                    style={{
+                      fontSize: "18px",
+                      marginBottom: "10px",
+                      marginTop: "15px",
+                    }}
+                  >
+                    <span>Stok:</span> {selectstock}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={() => handleEdit(selectedItem)}>
+            <BsPencil /> Edit
+          </Button>
+          <Button
+            variant="danger"
+            onClick={() => handleDelete(selectedItem._id)}
+          >
+            <BsTrash /> Hapus
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      <Modal show={showModal} onHide={handleClose} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>
             {editItemId ? "Edit" : "Tambah"} Data Barang
@@ -331,34 +398,32 @@ const getStatusMasuk = async () => {
         </Modal.Header>
         <Modal.Body>
           <Form>
-            {editItemId ? (
-              <Form.Group controlId="stock">
-                <Form.Label>Jenis Barang</Form.Label>
-                <Form.Control
-                  type="string"
-                  placeholder="Masukkan Jenis barang"
-                  value={jenisbarang}
-                  onChange={(e) => setJenisBarang(e.target.value)}
-                />
-                <Form.Label>Jumlah</Form.Label>
-                <Form.Control
-                  type="number"
-                  placeholder="Masukkan Jumlah barang"
-                  value={stock}
-                  onChange={(e) => setStock(e.target.value)}
-                />
-              </Form.Group>
-            ) : (
-              <Form.Group controlId="jenisbarang">
-                <Form.Label>Jenis Barang</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Masukkan jenis barang"
-                  value={jenisbarang}
-                  onChange={(e) => setJenisBarang(e.target.value)}
-                />
-              </Form.Group>
-            )}
+            <Form.Group controlId="jenisbarang">
+              <Form.Label>Jenis Barang</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Masukkan jenis barang"
+                value={jenisbarang}
+                onChange={(e) => setJenisBarang(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group
+              controlId="stock"
+              style={{ display: editItemId ? "block" : "none" }}
+            >
+              <Form.Label>Stok</Form.Label>
+              <Form.Control
+                type="number"
+                placeholder="Masukkan stok barang"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+              />
+            </Form.Group>
+
+            <Form.Group controlId="file">
+              <Form.Label>Upload Gambar Baru</Form.Label>
+              <Form.Control type="file" onChange={handleFileChange} />
+            </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
@@ -367,9 +432,10 @@ const getStatusMasuk = async () => {
           </Button>
           <Button
             variant="primary"
-            onClick={editItemId ? handleEditSubmit : handleSubmit}
+            onClick={handleSubmit}
+            disabled={!jenisbarang.trim()}
           >
-            {editItemId ? "Simpan" : "Tambah"}
+            {isLoading ? "Menyimpan..." : editItemId ? "Simpan" : "Tambah"}
           </Button>
         </Modal.Footer>
       </Modal>

@@ -6,8 +6,8 @@ import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import { FaBox } from "react-icons/fa";
 import { BsPlus, BsEyeFill, BsTrash } from "react-icons/bs";
-import Swal from "sweetalert2";
 import "./supplier.css";
+import Swal from "sweetalert2";
 
 const iconSize = "20px";
 const headerFontSize = "24px";
@@ -91,17 +91,16 @@ const UserComponent = () => {
         (item) => item.BarangId !== null && item.PTid !== null,
       );
 
-     const modifiedData = filteredData.map((item, index) => ({
-       ...item,
-       id: index + 1,
-       Tgl_PO: formatDate(item.Tgl_PO),
-       PTid: item.PTid ? item.PTid._id : null, // Add a null check for PTid and handle accordingly
-       PTname: item.PTid ? item.PTid.namaperusahaan : "",
-       BarangId: item.BarangId ? item.BarangId._id : null,
-       BarangName: item.BarangId ? item.BarangId.jenisbarang : "",
-       fileUrl: item.fileUrl,
-     }));
-
+      const modifiedData = filteredData.map((item, index) => ({
+        ...item,
+        id: index + 1,
+        Tgl_PO: formatDate(item.Tgl_PO),
+        PTid: item.PTid ? item.PTid._id : null,
+        PTname: item.PTid ? item.PTid.namaperusahaan : "",
+        BarangId: item.BarangId ? item.BarangId._id : null,
+        BarangName: item.BarangId ? item.BarangId.jenisbarang : "",
+        fileUrl: item.fileUrl,
+      }));
 
       const dataWithoutTimestamps = modifiedData.map(
         ({ createdAt, updatedAt, ...rest }) => rest,
@@ -164,35 +163,21 @@ const UserComponent = () => {
   const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      const result = await Swal.fire({
-        title: "Apakah Anda yakin?",
-        text: "Anda tidak akan dapat mengembalikan ini!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Ya, hapus!",
-        cancelButtonText: "Batal",
-      });
-      if (result.isConfirmed) {
+      if (
+        window.confirm(
+          "Apakah Anda yakin? Anda tidak akan dapat mengembalikan ini!",
+        )
+      ) {
         await axios.delete(`http://localhost:5000/api/v1/po/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         fetchInvoices();
-        Swal.fire({
-          icon: "success",
-          title: "Berhasil!",
-          text: "Data berhasil dihapus.",
-        });
+        alert("Data berhasil dihapus.");
       }
     } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: "Gagal menghapus data.",
-      });
+      alert("Gagal menghapus data.");
     }
   };
 
@@ -218,6 +203,11 @@ const UserComponent = () => {
           formDataWithFile.append(key, value);
         }
       });
+
+      const existingPO = Po.find((item) => item.No_po === formData.No_po);
+      if (existingPO) {
+        throw new Error("Silakan gunakan nomor PO yang berbeda.");
+      }
 
       const barang = Barang.find((item) => item._id === formData.BarangId);
       if (!barang) {
@@ -249,18 +239,18 @@ const UserComponent = () => {
       }
       handleClose();
       fetchInvoices();
-      Swal.fire({
-        icon: "success",
-        title: "Berhasil!",
-        text: selectedRow
-          ? "Data berhasil diperbarui."
-          : "Data berhasil ditambahkan.",
-      });
+       Swal.fire({
+         icon: "success",
+         title: "Berhasil!",
+         text: selectedRow
+           ? "Data berhasil diperbarui."
+           : "Data berhasil ditambahkan.",
+       });
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Error!",
-        text: error.message,
+        text: "Gagal menambahkan data.",
       });
     } finally {
       setLoading(false);
@@ -325,14 +315,24 @@ const UserComponent = () => {
     },
   ];
 
-  const filteredData = Po.filter(
-    (item) =>
-      (item.No_po &&
-        item.No_po.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (item.Bahan_Baku &&
-        item.Bahan_Baku.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      searchQuery.trim() === "",
-  );
+ const filteredData = Po.filter(
+   (item) =>
+     (item.No_po &&
+       item.No_po.toLowerCase().includes(searchQuery.toLowerCase())) ||
+     (item.Bahan_Baku &&
+       item.Bahan_Baku.toLowerCase().includes(searchQuery.toLowerCase())) ||
+     searchQuery.trim() === "",
+ ).map((item, index) => ({
+   ...item,
+   id: index + 1,
+ }));
+
+  const isFormValid =
+    formData.No_po &&
+    formData.jumlah &&
+    formData.PTid &&
+    formData.BarangId &&
+    formData.price;
 
   return (
     <div className="main-container">
@@ -371,6 +371,7 @@ const UserComponent = () => {
           type="text"
           placeholder="Cari berdasarkan No Po"
           value={searchQuery}
+          style={{ width: "30%" }}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="form-control"
         />
@@ -474,7 +475,11 @@ const UserComponent = () => {
           <Button variant="secondary" onClick={handleClose}>
             Tutup
           </Button>
-          <Button variant="primary" onClick={handleSubmit} disabled={loading}>
+          <Button
+            variant="primary"
+            onClick={handleSubmit}
+            disabled={loading || !isFormValid}
+          >
             {loading ? "Mengirimkan..." : "Tambahkan"}
           </Button>
         </Modal.Footer>

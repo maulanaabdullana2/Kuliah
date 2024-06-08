@@ -6,7 +6,6 @@ import { FaUserFriends } from "react-icons/fa";
 import { BsPlus, BsTrash } from "react-icons/bs";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
-import Swal from "sweetalert2";
 
 const iconSize = "20px";
 const headerFontSize = "24px";
@@ -37,33 +36,13 @@ function Petugas() {
 
   const handleSubmit = async () => {
     try {
-      if (
-        !formData.username ||
-        !formData.password ||
-        !formData.name ||
-        !formData.role ||
-        !formData.lokasi ||
-        !formData.jabatan
-      ) {
-        Swal.fire({
-          icon: "error",
-          title: "Kesalahan",
-          text: "Silakan isi semua kolom",
-        });
-        return;
-      }
-
       const token = localStorage.getItem("token");
-      const response = await axios.post(
-        "http://localhost:5000/api/v1/auth/add",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+      await axios.post("http://localhost:5000/api/v1/auth/add", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-      );
+      });
       setFormData({
         username: "",
         password: "",
@@ -74,19 +53,8 @@ function Petugas() {
       });
       handleCloseModal();
       fetchDataUser();
-      Swal.fire({
-        icon: "success",
-        title: "User berhasil ditambahkan",
-        showConfirmButton: false,
-        timer: 1500,
-      });
     } catch (error) {
       console.error("Kesalahan menambahkan pengguna:", error.message);
-      Swal.fire({
-        icon: "error",
-        title: "Kesalahan",
-        text: "Gagal menambahkan pengguna",
-      });
     }
   };
 
@@ -105,7 +73,7 @@ function Petugas() {
       const formattedData = response.data.data.map((user, index) => ({
         ...user,
         id: user._id,
-        no:index+1
+        no: index + 1,
       }));
 
       setUsers(formattedData);
@@ -118,43 +86,20 @@ function Petugas() {
     fetchDataUser();
   }, []);
 
-  const handleDeleteUser = (id) => {
-    Swal.fire({
-      title: "Apakah Anda yakin?",
-      text: "Anda tidak akan bisa mengembalikannya!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Ya, hapus!",
-      cancelButtonText: "Tidak, batalkan!",
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      reverseButtons: true,
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const token = localStorage.getItem("token");
-          await axios.delete(`http://localhost:5000/api/v1/auth/users/${id}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          fetchDataUser();
-          Swal.fire({
-            icon: "success",
-            title: "User berhasil dihapus",
-            showConfirmButton: false,
-            timer: 1500,
-          });
-        } catch (error) {
-          console.error("Kesalahan menghapus pengguna:", error.message);
-          Swal.fire({
-            icon: "error",
-            title: "Kesalahan",
-            text: "Gagal menghapus pengguna",
-          });
-        }
+  const handleDeleteUser = async (id) => {
+    if (window.confirm("Apakah Anda yakin ingin menghapus pengguna ini?")) {
+      try {
+        const token = localStorage.getItem("token");
+        await axios.delete(`http://localhost:5000/api/v1/auth/users/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        fetchDataUser();
+      } catch (error) {
+        console.error("Kesalahan menghapus pengguna:", error.message);
       }
-    });
+    }
   };
 
   const columns = [
@@ -221,12 +166,11 @@ function Petugas() {
       headerName: "Aksi",
       headerAlign: "center",
       align: "center",
-      renderCell: (params) => <SwalDeleteButton id={params.row.id} />,
+      renderCell: (params) => <DeleteButton id={params.row.id} />,
     },
   ];
 
-
-  const SwalDeleteButton = ({ id }) => (
+  const DeleteButton = ({ id }) => (
     <Button variant="danger" size="sm" onClick={() => handleDeleteUser(id)}>
       <BsTrash style={{ marginRight: "5px" }} />
     </Button>
@@ -236,8 +180,17 @@ function Petugas() {
     setSearchTerm(e.target.value);
   };
 
-  const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  const filteredUsers = users
+    .filter((user) =>
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    )
+    .map((user, index) => ({
+      ...user,
+      no: index + 1,
+    }));
+
+  const isFormValid = Object.values(formData).every(
+    (value) => value.trim() !== "",
   );
 
   return (
@@ -258,7 +211,7 @@ function Petugas() {
             }}
           >
             <FaUserFriends style={{ marginRight: "5px", fontSize: iconSize }} />
-           Data Petugas
+            Data Petugas
           </h1>
         </div>
         <Button
@@ -277,6 +230,7 @@ function Petugas() {
           type="text"
           placeholder="Cari Berdasarkan Nama Petugas"
           className="form-control"
+          style={{width:"30%"}}
           value={searchTerm}
           onChange={handleSearch}
         />
@@ -367,7 +321,11 @@ function Petugas() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={handleSubmit}>
+          <Button
+            variant="primary"
+            onClick={handleSubmit}
+            disabled={!isFormValid}
+          >
             Simpan Perubahan
           </Button>
           <Button variant="danger" onClick={handleCloseModal}>

@@ -7,7 +7,9 @@ const Suppliers = require("../models/BarangModels");
 const POorder = require("../models/InModels");;
 
 const login = async (req, res, next) => {
-  const { username, password } = req.body;
+  let { username, password } = req.body;
+   username = username.trim();
+   password = password.trim();
   try {
     const user = await User.findOne({ username });
     if (!user) {
@@ -57,12 +59,10 @@ const currentuser = async (req, res, next) => {
   try {
     const data = {
       _id: req.user._id,
-      username: req.user.username,
       name: req.user.name,
       jabatan:req.user.jabatan,
       lokasi:req.user.lokasi,
       imageUrl: req.user.imageUrl,
-      role: req.user.role,
     };
 
     res.status(200).json({
@@ -96,7 +96,8 @@ const getUserById = async (req, res, next) => {
 };
 
 const addUser = async (req, res, next) => {
-  const { username, password, name, role, lokasi, jabatan } = req.body;
+  let { username, password, name, role, lokasi, jabatan } = req.body;
+  username = username.toLowerCase();
   try {
     let existingUser = await User.findOne({ username });
     if (existingUser) {
@@ -111,7 +112,7 @@ const addUser = async (req, res, next) => {
       name,
       role,
       lokasi,
-      jabatan, // Adding jabatan field
+      jabatan,
     });
 
     await newUser.save();
@@ -166,6 +167,7 @@ const deleteUser = async (req, res, next) => {
    }
 
    const DeleteUser = await User.findByIdAndDelete(id);
+
 
     res.status(200).json({
       status: "Success",
@@ -229,7 +231,7 @@ const updateUser = async (req, res, next) => {
         name: user.name,
         imageUrl: user.imageUrl,
         lokasi: user.lokasi,
-        jabatan: user.jabatan, // Returning jabatan in response
+        jabatan: user.jabatan,
       },
     });
   } catch (error) {

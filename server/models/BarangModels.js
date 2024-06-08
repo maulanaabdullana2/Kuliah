@@ -1,9 +1,14 @@
 const mongoose = require("mongoose");
 
+
 const BarangSchema = new mongoose.Schema(
   {
     jenisbarang: {
       type: String,
+    },
+    image: {
+      type: String,
+      default: "https://ik.imagekit.io/aiilsappn/pngwing.com(1).png",
     },
     stock: {
       type: Number,

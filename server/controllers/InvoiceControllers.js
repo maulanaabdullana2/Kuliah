@@ -64,7 +64,6 @@ const generateInvoice = async (req, res, next) => {
        client: {
          company: NamaPerusahaan.namaperusahaan || "",
          zip: NamaPerusahaan.alamat || "",
-         country: NamaPerusahaan.wilayah,
        },
        invoiceDate: new Date().toDateString(),
        products: products.filter((product) => product.quantity > 0),
