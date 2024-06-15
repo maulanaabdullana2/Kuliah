@@ -27,14 +27,14 @@ const login = async (req, res, next) => {
     };
 
     const accessToken = jwt.sign(payload, process.env.JWT_SECRET || "aaaaaa", {
-      expiresIn: "3d",
+      expiresIn: "1m",
     });
 
     const refreshToken = jwt.sign(
       payload,
       process.env.REFRESHTOKEN_SECRET || "aaaaaa",
       {
-        expiresIn: "3d",
+        expiresIn: "1m",
       },
     );
 

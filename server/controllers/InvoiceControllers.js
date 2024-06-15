@@ -17,7 +17,6 @@ const generateInvoice = async (req, res, next) => {
        const order = await POorder.findById(element.orderId);
        const barang = await Barang.findById(order?.BarangId);
        idperusahaan = order.PTid
-       console.log(order);
        if (barang) {
          products.push({
            quantity: order?.jumlah  || 1000,
