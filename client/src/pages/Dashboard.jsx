@@ -17,15 +17,18 @@ function DashboardComponents(props) {
   const [isAdmin, setIsAdmin] = useState(false);
   const token = localStorage.getItem("token");
   const Navigate = useNavigate()
-
   useEffect(() => {
-    const decodedToken = jwtDecode(token);
-    if (decodedToken && decodedToken.role === "admin") {
-      setIsAdmin(true);
-    }else{
-      Navigate('/dashboard/users')
+    if (!token) {
+      Navigate("/");
+    } else {
+      const decodedToken = jwtDecode(token);
+      if (decodedToken && decodedToken.role === "admin") {
+        setIsAdmin(true);
+      } else {
+        Navigate("/dashboard/users");
+      }
     }
-  }, [token]);
+  }, [token, Navigate]);
 
   const OpenSidebar = () => {
     setOpenSidebarToggle(!openSidebarToggle);

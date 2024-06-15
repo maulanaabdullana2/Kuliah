@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Form, Button } from "react-bootstrap";
+import { Form, Button, InputGroup } from "react-bootstrap";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { CiSettings } from "react-icons/ci";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const iconSize = "25px";
 const headerFontSize = "24px";
@@ -15,7 +16,9 @@ function UpdateProfile() {
   const [lokasi, setLokasi] = useState("");
   const [image, setImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
-  const [isLoading, setIsLoading] = useState(false); // State for loading indicator
+  const [isLoading, setIsLoading] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
   useEffect(() => {
     getUserData();
@@ -48,7 +51,7 @@ function UpdateProfile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // Set loading to true before request
+    setIsLoading(true);
 
     try {
       const token = localStorage.getItem("token");
@@ -70,18 +73,32 @@ function UpdateProfile() {
       setNewPassword("");
       Swal.fire({
         icon: "success",
-        title: "Success",
-        text: "Profile updated successfully!",
+        title: "Berhasil",
+        text: "Profil berhasil diperbarui!",
       });
     } catch (error) {
       console.error("Error:", error.message);
+
+      let errorMessage = "Gagal memperbarui profil. Silakan coba lagi.";
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        if (error.response.data.message === "Incorrect old password") {
+          errorMessage = "Kata sandi lama yang Anda masukkan salah.";
+        } else {
+          errorMessage = error.response.data.message;
+        }
+      }
+
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Failed to update profile. Please try again.",
+        text: errorMessage,
       });
     } finally {
-      setIsLoading(false); // Set loading back to false after request
+      setIsLoading(false);
     }
   };
 
@@ -122,22 +139,38 @@ function UpdateProfile() {
 
         <Form.Group controlId="formOldPassword">
           <Form.Label>Old Password:</Form.Label>
-          <Form.Control
-            type="password"
-            placeholder="Masukan Password Lama"
-            value={oldpassword}
-            onChange={(e) => setOldPassword(e.target.value)}
-          />
+          <InputGroup>
+            <Form.Control
+              type={showOldPassword ? "text" : "password"}
+              placeholder="Masukan Password Lama"
+              value={oldpassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+            />
+            <InputGroup.Text
+              onClick={() => setShowOldPassword(!showOldPassword)}
+              style={{ cursor: "pointer" }}
+            >
+              {showOldPassword ? <FaEyeSlash /> : <FaEye />}
+            </InputGroup.Text>
+          </InputGroup>
         </Form.Group>
 
         <Form.Group controlId="formNewPassword">
           <Form.Label>New Password:</Form.Label>
-          <Form.Control
-            type="password"
-            placeholder="Masukan Password Baru"
-            value={newpassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-          />
+          <InputGroup>
+            <Form.Control
+              type={showNewPassword ? "text" : "password"}
+              placeholder="Masukan Password Baru"
+              value={newpassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+            <InputGroup.Text
+              onClick={() => setShowNewPassword(!showNewPassword)}
+              style={{ cursor: "pointer" }}
+            >
+              {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+            </InputGroup.Text>
+          </InputGroup>
         </Form.Group>
 
         <Form.Group controlId="formImage">
