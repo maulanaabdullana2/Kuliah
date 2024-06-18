@@ -194,7 +194,7 @@ const UserComponent = () => {
         <div className="me-2 mb-2">
           <input
             type="text"
-            placeholder="Cari Berdasarkan No Po"
+            placeholder="Cari Berdasarkan No PO"
             value={searchQuery}
             onChange={handleSearchChange}
             className="form-control"

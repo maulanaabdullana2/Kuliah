@@ -26,16 +26,11 @@ const login = async (req, res, next) => {
       role: user.role,
     };
 
-    const accessToken = jwt.sign(payload, process.env.JWT_SECRET || "aaaaaa", {
-      expiresIn: "3d",
-    });
+    const accessToken = jwt.sign(payload, process.env.JWT_SECRET || "aaaaaa",);
 
     const refreshToken = jwt.sign(
       payload,
       process.env.REFRESHTOKEN_SECRET || "aaaaaa",
-      {
-        expiresIn: "3d",
-      },
     );
 
     user.refreshToken = refreshToken;

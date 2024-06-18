@@ -400,7 +400,7 @@ const isFormValid =
       <div className="mb-3">
         <input
           type="text"
-          placeholder="Cari berdasarkan No Po"
+          placeholder="Cari berdasarkan No PO"
           value={searchQuery}
           style={{ width: "30%" }}
           onChange={(e) => setSearchQuery(e.target.value)}

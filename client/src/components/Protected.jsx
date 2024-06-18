@@ -14,27 +14,36 @@ function Protected({ children }) {
             Authorization: `Bearer ${token}`,
           },
         });
+        // Jika berhasil, biarkan pengguna melanjutkan
       } catch (error) {
         if (axios.isAxiosError(error)) {
-          if (error.response.status === 401) {
+          if (error.response && error.response.status === 401) {
+            // Token expired, hapus token dan arahkan ke halaman login
             localStorage.removeItem("token");
-            return (window.location.href = "/");
+            toast.warn("Session expired. Please login again.");
+            navigate("/");
+          } else {
+            // Kesalahan lain dari server
+            toast.error(
+              error.response ? error.response.data.message : error.message,
+            );
           }
-
-          toast.error(error.response.data.message);
-          return;
+        } else {
+          // Kesalahan jaringan atau lainnya
+          toast.error(error.message);
         }
-        toast.error(error.message);
       }
     };
 
     const token = localStorage.getItem("token");
 
     if (!token) {
-      return navigate("/");
+      // Jika tidak ada token, arahkan kembali ke halaman login
+      navigate("/");
+      return;
     }
 
-    // get user information
+    // Lakukan pengecekan token
     getMe(token);
   }, [navigate]);
 
