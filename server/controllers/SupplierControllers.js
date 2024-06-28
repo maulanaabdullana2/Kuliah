@@ -5,6 +5,16 @@ const ApiError = require("../utils/ApiError")
 const createsupplier = async(req,res,next) =>{
     try {
         const {namaperusahaan,alamat} = req.body
+
+        const existingSupplier = await Suppliers.findOne({
+          namaperusahaan
+        });
+        if (existingSupplier) {
+          return res.status(400).json({
+            status: "fail",
+            message: "Nama perusahaan sudah ada",
+          });
+        }
         const supllier = await Suppliers.create({
             namaperusahaan,
             alamat,

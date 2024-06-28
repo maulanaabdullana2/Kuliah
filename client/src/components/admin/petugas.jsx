@@ -6,6 +6,7 @@ import { FaUserFriends } from "react-icons/fa";
 import { BsPlus, BsTrash } from "react-icons/bs";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
+import Swal from "sweetalert2"; // Import SweetAlert
 
 const iconSize = "20px";
 const headerFontSize = "24px";
@@ -53,8 +54,19 @@ function Petugas() {
       });
       handleCloseModal();
       fetchDataUser();
+
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil",
+        text: "Pengguna berhasil ditambahkan!",
+      });
     } catch (error) {
       console.error("Kesalahan menambahkan pengguna:", error.message);
+      Swal.fire({
+        icon: "error",
+        title: "Kesalahan",
+        text: "Pengguna Sudah Ada",
+      });
     }
   };
 
@@ -87,7 +99,18 @@ function Petugas() {
   }, []);
 
   const handleDeleteUser = async (id) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus pengguna ini?")) {
+    const result = await Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: "Anda tidak akan dapat mengembalikan ini!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Ya, hapus!",
+      cancelButtonText: "Batal",
+    });
+
+    if (result.isConfirmed) {
       try {
         const token = localStorage.getItem("token");
         await axios.delete(`http://localhost:5000/api/v1/auth/users/${id}`, {
@@ -96,8 +119,18 @@ function Petugas() {
           },
         });
         fetchDataUser();
+        Swal.fire({
+          icon: "success",
+          title: "Berhasil",
+          text: "Pengguna berhasil dihapus!",
+        });
       } catch (error) {
         console.error("Kesalahan menghapus pengguna:", error.message);
+        Swal.fire({
+          icon: "error",
+          title: "Kesalahan",
+          text: "Terjadi kesalahan saat menghapus pengguna.",
+        });
       }
     }
   };
@@ -230,7 +263,7 @@ function Petugas() {
           type="text"
           placeholder="Cari Berdasarkan Nama Petugas"
           className="form-control"
-          style={{width:"30%"}}
+          style={{ width: "30%" }}
           value={searchTerm}
           onChange={handleSearch}
         />

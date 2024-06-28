@@ -66,38 +66,54 @@ function Supplier() {
     }
   };
 
-  const handleSubmit = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.post(
-        "http://localhost:5000/api/v1/pt/add",
-        {
-          namaperusahaan: namaPerusahaan,
-          alamat: alamat,
+ const handleSubmit = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    await axios.post(
+      "http://localhost:5000/api/v1/pt/add",
+      {
+        namaperusahaan: namaPerusahaan,
+        alamat: alamat,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      Swal.fire({
-        icon: "success",
-        title: "Berhasil",
-        text: "Data berhasil ditambahkan.",
-      });
-      handleCloseModal();
-      setNamaPerusahaan("");
-      setAlamat("");
-      fetchData();
-    } catch (error) {
+      },
+    );
+    Swal.fire({
+      icon: "success",
+      title: "Berhasil",
+      text: "Data berhasil ditambahkan.",
+    });
+    handleCloseModal();
+    setNamaPerusahaan("");
+    setAlamat("");
+    fetchData();
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.message) {
+      if (error.response.data.message === "Nama perusahaan sudah ada") {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Nama perusahaan sudah ada.",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: error.response.data.message,
+        });
+      }
+    } else {
       Swal.fire({
         icon: "error",
         title: "Oops...",
         text: "Ada kesalahan!",
       });
     }
-  };
+  }
+};
 
   const handleEditSubmit = async () => {
     try {

@@ -279,7 +279,7 @@ const handleSubmit = async () => {
       Swal.fire({
         icon: "error",
         title: "Error!",
-        text: "Gagal menambahkan data.",
+        text: "No PO udah tersedia",
       });
     }
   } finally {

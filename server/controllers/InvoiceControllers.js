@@ -70,8 +70,8 @@ const generateInvoice = async (req, res, next) => {
         zip: NamaPerusahaan.alamat || "",
       },
       information: {
-        number: generateInvoiceNumber(),
-        date: new Date().toLocaleDateString(),
+        number:generateInvoiceNumber(),
+        date:new Date().toLocaleDateString(),
       },
       invoiceDate: new Date().toDateString(),
       products: products.filter((product) => product.quantity > 0),
