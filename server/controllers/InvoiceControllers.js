@@ -46,7 +46,7 @@ const generateInvoice = async (req, res, next) => {
     // Membuat data invoice
     const data = {
       apiKey:
-        "8X5mXyiYnBRY8QRd6y6xpkBTjJkPwfWnk6cI1A4VNv6FBtUDTN89M3k7VTM8yPE1",
+        "wHhs4qe75bKAVLj0msYbtAWYmVX0kwDZD3L9T8wap8Bmqj8FgnEZmWNsPOwtBdil",
       images: {
         logo: "https://ik.imagekit.io/aiilsappn/WhatsApp%20Image%202024-03-26%20at%2013.13.37_bb9b3324.jpg?updatedAt=1711433794721",
       },
@@ -70,8 +70,8 @@ const generateInvoice = async (req, res, next) => {
         zip: NamaPerusahaan.alamat || "",
       },
       information: {
-        number:generateInvoiceNumber(),
-        date:new Date().toLocaleDateString(),
+        number: generateInvoiceNumber(),
+        date: new Date().toLocaleDateString(),
       },
       invoiceDate: new Date().toDateString(),
       products: products.filter((product) => product.quantity > 0),
